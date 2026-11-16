@@ -1,0 +1,432 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>แผ่นเสียงถึงเธอ</title>
+<meta name="description" content="ส่งเพลงให้คนที่คิดถึง ในรูปแผ่นเสียง">
+<meta property="og:title" content="มีแผ่นเสียงส่งถึงคุณ 💿">
+<meta property="og:description" content="เปิดดูสิ ใครบางคนอยากให้ฟังเพลงนี้">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Mali:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#f3e9d8; --ink:#3a2a20; --muted:#8b7563; --line:#e2d2b9;
+  --card:#fbf5ea; --accent:#c4573e; --accent-d:#93402c; --accent2:#7c9a6d;
+  --wood1:#8a5634; --wood2:#9a6440; --wood3:#7a4a2b; --brass1:#f1ddb0; --brass2:#c39a5c;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{
+  font-family:'Mali',system-ui,sans-serif;color:var(--ink);
+  background:var(--paper);
+  background-image:
+    radial-gradient(rgba(58,42,32,.06) 1px,transparent 1px),
+    radial-gradient(ellipse at top,rgba(255,240,210,.7),transparent 70%);
+  background-size:12px 12px,100% 100%;
+  min-height:100vh;
+}
+.wrap{max-width:520px;margin:0 auto;padding:28px 16px 60px}
+h1{font-size:26px;margin:0 0 4px;text-align:center;letter-spacing:.3px}
+.sub{color:var(--muted);text-align:center;margin:0 0 22px;font-size:15px}
+.hidden{display:none!important}
+button{font:inherit;cursor:pointer}
+.btn{background:var(--accent);color:#fff8ee;border:0;border-radius:999px;padding:12px 22px;font-weight:700;font-size:16px;box-shadow:0 3px 0 var(--accent-d);transition:transform .1s}
+.btn:active{transform:translateY(2px);box-shadow:0 1px 0 var(--accent-d)}
+.btn.ghost{background:transparent;color:var(--ink);border:2px solid var(--ink);box-shadow:none}
+.center{text-align:center}
+
+/* ---------- create form ---------- */
+.card{background:var(--card);border:2px solid var(--line);border-radius:18px;padding:20px;box-shadow:0 2px 0 var(--line)}
+label{display:block;font-weight:600;margin:14px 0 6px;font-size:15px}
+label small{font-weight:400;color:var(--muted)}
+input[type=text],input[type=url],input[type=number],textarea{
+  width:100%;font:inherit;font-size:16px;padding:10px 12px;border-radius:12px;
+  border:2px solid var(--line);background:#fffdf8;color:var(--ink)}
+input:focus,textarea:focus{outline:none;border-color:var(--accent2)}
+textarea{min-height:110px;resize:vertical}
+.row{display:flex;gap:10px}
+.row>div{flex:1}
+.swatches{display:flex;gap:10px;flex-wrap:wrap}
+.swatch{width:38px;height:38px;border-radius:50%;border:3px solid transparent;box-shadow:0 0 0 2px var(--line)}
+.swatch.on{border-color:#fff;box-shadow:0 0 0 3px var(--ink)}
+.photo-pick{display:flex;align-items:center;gap:12px}
+.photo-pick img{width:64px;height:64px;object-fit:cover;border-radius:10px;border:2px solid var(--line)}
+.err{color:#b03a22;font-size:14px;margin-top:6px}
+.result{margin-top:18px}
+.linkbox{display:flex;gap:8px;margin-top:8px}
+.linkbox input{flex:1;font-size:13px}
+
+/* ---------- record ---------- */
+.rec{width:220px;max-width:62vw;aspect-ratio:1;position:relative;touch-action:none;user-select:none;-webkit-user-select:none;border-radius:50%}
+.rec svg{width:100%;height:100%;display:block;border-radius:50%;filter:drop-shadow(0 6px 10px rgba(40,20,10,.35))}
+.rec::after{content:"";position:absolute;inset:2%;border-radius:50%;pointer-events:none;
+  background:conic-gradient(from 20deg,transparent 0 8%,rgba(255,255,255,.13) 12%,transparent 17% 58%,rgba(255,255,255,.1) 62%,transparent 67%)}
+.spin svg{animation:spin 1.8s linear infinite}
+.paused svg{animation-play-state:paused}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* sleeve (create preview) */
+.sleeve-wrap{position:relative;width:290px;max-width:100%;height:200px;margin:0 auto 10px}
+.sleeve-wrap .rec{position:absolute;right:0;top:12px;width:176px;transition:right .4s}
+.sleeve{position:absolute;left:0;top:6px;width:188px;height:188px;z-index:2;border-radius:4px;
+  background:
+    radial-gradient(circle at 50% 50%,rgba(0,0,0,.18) 0 15px,transparent 16px),
+    repeating-linear-gradient(0deg,rgba(90,60,30,.05) 0 2px,transparent 2px 5px),
+    linear-gradient(135deg,#d8b88a,#c49c69);
+  box-shadow:0 6px 14px rgba(60,30,10,.25),inset 0 0 0 1px rgba(80,50,20,.25);
+  display:flex;flex-direction:column;justify-content:flex-end;padding:14px;color:#4a3322}
+.sleeve .st{font-size:13px;opacity:.75}
+.sleeve .sn{font-size:20px;font-weight:700;line-height:1.2;word-break:break-word}
+.sleeve::before{content:"";position:absolute;left:14px;right:14px;top:14px;height:3px;background:rgba(74,51,34,.35);border-radius:2px}
+
+/* ---------- turntable ---------- */
+.stage{display:flex;flex-direction:column;align-items:center;gap:26px;margin-top:8px}
+.tt{width:350px;max-width:92vw;aspect-ratio:1.06;border-radius:18px;position:relative;
+  background:
+    linear-gradient(180deg,rgba(255,230,190,.18),rgba(0,0,0,.12)),
+    repeating-linear-gradient(91deg,var(--wood1) 0 7px,var(--wood2) 7px 10px,var(--wood3) 10px 16px,var(--wood2) 16px 19px);
+  box-shadow:0 9px 0 #4e2f1b,0 20px 34px rgba(60,30,10,.35),inset 0 0 0 3px rgba(255,220,170,.15)}
+.platter{position:absolute;left:4.5%;top:4.5%;width:68%;aspect-ratio:1;border-radius:50%;
+  background:radial-gradient(circle,#4a4440 0 4%,#24201e 4.5% 100%);
+  box-shadow:0 0 0 7px #cdbb9c,0 0 0 9px #8f7c60,0 4px 10px 8px rgba(0,0,0,.25);transition:box-shadow .2s}
+.platter.hot{box-shadow:0 0 0 7px var(--brass1),0 0 0 9px var(--brass2),0 0 22px 10px rgba(255,210,140,.6)}
+.platter .hint{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#a5968a;font-size:15px;text-align:center;padding:0 22%}
+.platter .slot{position:absolute;inset:2%}
+.platter .slot .rec{width:100%;max-width:none}
+.arm{position:absolute;right:4%;top:6%;width:25%;transform-origin:70% 11%;transform:rotate(0deg);transition:transform 1s cubic-bezier(.4,0,.2,1);pointer-events:none;z-index:5}
+.arm svg{width:100%;display:block;filter:drop-shadow(2px 4px 3px rgba(0,0,0,.35))}
+.tt.on .arm{transform:rotate(24deg)}
+.panel{position:absolute;left:5%;bottom:5%;display:flex;align-items:center;gap:7px;color:#f3dcc0;font-size:12px;letter-spacing:1.5px}
+.led{width:9px;height:9px;border-radius:50%;background:#5a2a1f;box-shadow:inset 0 1px 1px rgba(0,0,0,.5)}
+.tt.on .led{background:#ff7a4a;box-shadow:0 0 8px #ff7a4a}
+.keys{position:absolute;right:5%;bottom:4.5%;display:flex;gap:8px}
+.key{width:40px;height:40px;border-radius:50%;border:0;font-size:14px;color:#4a3322;
+  background:radial-gradient(circle at 35% 30%,var(--brass1),var(--brass2));box-shadow:0 3px 0 #7d5e33,0 4px 6px rgba(0,0,0,.3)}
+.key:active{transform:translateY(2px);box-shadow:0 1px 0 #7d5e33}
+.key:disabled{opacity:.55;cursor:default}
+.drag-hint{color:var(--muted);font-size:14px;animation:bob 1.6s ease-in-out infinite}
+@keyframes bob{50%{transform:translateY(-4px)}}
+.rec.dragging{z-index:50;cursor:grabbing}
+.rec.draggable{cursor:grab}
+
+.reveal{width:100%;display:flex;flex-direction:column;align-items:center;gap:20px;opacity:0;transform:translateY(12px);transition:opacity .6s,transform .6s}
+.reveal.show{opacity:1;transform:none}
+.polaroid{background:#fffaf0;padding:10px 10px 34px;box-shadow:0 8px 20px rgba(60,30,10,.18);transform:rotate(-3deg);width:210px;position:relative}
+.polaroid::before{content:"";position:absolute;top:-10px;left:50%;width:70px;height:22px;transform:translateX(-50%) rotate(2deg);background:rgba(232,210,160,.75)}
+.polaroid img{width:100%;aspect-ratio:1;object-fit:cover;display:block;background:#eee;filter:sepia(.15) saturate(.95)}
+.polaroid .cap{position:absolute;bottom:8px;left:0;right:0;text-align:center;font-size:14px;color:var(--muted)}
+.letter{background:var(--card);border:2px solid var(--line);border-radius:14px;padding:20px 20px 16px;width:100%;
+  background-image:repeating-linear-gradient(transparent 0 31px,var(--line) 31px 32px);background-position:0 20px;line-height:32px;font-size:17px;white-space:pre-wrap;word-break:break-word;min-height:120px}
+.letter .from{text-align:right;color:var(--muted);margin-top:6px}
+.caret{display:inline-block;width:2px;height:1em;background:var(--ink);vertical-align:-2px;animation:blink 1s steps(1) infinite}
+@keyframes blink{50%{opacity:0}}
+.video{width:100%;aspect-ratio:16/9;border-radius:14px;overflow:hidden;background:#000;border:6px solid #e9dcc4}
+.video iframe,.video>div{width:100%;height:100%;display:block;border:0}
+.foot{color:var(--muted);font-size:13px;text-align:center;margin-top:30px}
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--ink);color:#fff;padding:10px 18px;border-radius:999px;font-size:14px;opacity:0;transition:opacity .3s;pointer-events:none}
+.toast.show{opacity:1}
+@media (prefers-reduced-motion:reduce){.spin svg,.drag-hint{animation:none}.arm{transition:none}}
+</style>
+</head>
+<body>
+
+<!-- ============ CREATE ============ -->
+<main id="create" class="wrap hidden">
+  <h1>💿 ทำแผ่นเสียงให้ใครสักคน</h1>
+  <p class="sub">เลือกเพลง เขียนข้อความ แล้วส่งลิงก์ให้เขาเปิดฟัง</p>
+
+  <div class="sleeve-wrap">
+    <div class="rec" id="previewRec"></div>
+    <div class="sleeve"><div class="st">a song for</div><div class="sn" id="sleeveName">ใครสักคน</div></div>
+  </div>
+
+  <div class="card">
+    <div class="row">
+      <div><label for="fTo">ถึง</label><input id="fTo" type="text" maxlength="30" placeholder="ชื่อเขา"></div>
+      <div><label for="fFrom">จาก</label><input id="fFrom" type="text" maxlength="30" placeholder="ชื่อเรา"></div>
+    </div>
+
+    <label for="fSong">ลิงก์เพลงจาก YouTube <small>(วางลิงก์ได้เลย)</small></label>
+    <input id="fSong" type="url" inputmode="url" placeholder="https://youtu.be/...">
+    <div id="songErr" class="err hidden">ลิงก์นี้ไม่ใช่ลิงก์ YouTube ลองคัดลอกจากปุ่มแชร์อีกครั้งนะ</div>
+
+    <label for="fStart">เริ่มเล่นที่วินาที <small>(ไม่ใส่ก็ได้ เช่น ข้ามไปท่อนฮุก)</small></label>
+    <input id="fStart" type="number" min="0" step="1" placeholder="0">
+
+    <label for="fMsg">ข้อความ</label>
+    <textarea id="fMsg" maxlength="600" placeholder="อยากบอกอะไรเขาผ่านเพลงนี้..."></textarea>
+
+    <label>รูป <small>(ไม่ใส่ก็ได้)</small></label>
+    <div class="photo-pick">
+      <img id="photoThumb" class="hidden" alt="">
+      <button class="btn ghost" id="photoBtn" type="button">เลือกรูป</button>
+      <button class="btn ghost hidden" id="photoClear" type="button">ลบ</button>
+      <input id="fPhoto" type="file" accept="image/*" class="hidden">
+    </div>
+
+    <label>สีป้ายกลางแผ่น</label>
+    <div class="swatches" id="swatches"></div>
+
+    <div class="center" style="margin-top:22px">
+      <button class="btn" id="makeBtn" type="button">ทำแผ่นเสียง ✨</button>
+    </div>
+
+    <div id="result" class="result hidden">
+      <label>ลิงก์สำหรับส่งให้เขา</label>
+      <div class="linkbox">
+        <input id="outLink" type="text" readonly>
+        <button class="btn" id="copyBtn" type="button">คัดลอก</button>
+      </div>
+      <div class="center" style="margin-top:12px;display:flex;gap:10px;justify-content:center;flex-wrap:wrap">
+        <button class="btn ghost" id="shareBtn" type="button">แชร์</button>
+        <a class="btn ghost" id="openLink" target="_blank" style="text-decoration:none">ลองเปิดดู</a>
+      </div>
+    </div>
+  </div>
+  <p class="foot">ทุกอย่างเก็บอยู่ในลิงก์ ไม่มีการบันทึกข้อมูลไว้ที่ไหน · ใครมีลิงก์ก็เปิดดูได้</p>
+</main>
+
+<!-- ============ RECEIVE ============ -->
+<main id="receive" class="wrap hidden">
+  <h1 id="rTitle">มีแผ่นเสียงส่งถึงคุณ</h1>
+  <p class="sub" id="rSub">ลากแผ่นเสียงไปวางบนเครื่องเล่นเลย</p>
+
+  <div class="stage">
+    <div class="tt" id="tt">
+      <div class="platter" id="platter">
+        <div class="hint" id="platHint">วางแผ่นตรงนี้</div>
+        <div class="slot" id="slot"></div>
+      </div>
+      <div class="arm" aria-hidden="true">
+        <svg viewBox="0 0 100 270" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="70" cy="30" r="22" fill="#2b2421"/>
+          <circle cx="70" cy="30" r="15" fill="url(#brass)" stroke="#7d5e33" stroke-width="2"/>
+          <rect x="62" y="2" width="16" height="14" rx="4" fill="#3a302b"/>
+          <path d="M70 30 L66 205 Q64 222 46 236" fill="none" stroke="#d9cdb8" stroke-width="7" stroke-linecap="round"/>
+          <path d="M70 30 L66 205 Q64 222 46 236" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" opacity=".5"/>
+          <rect x="26" y="228" width="30" height="20" rx="4" fill="#2b2421" transform="rotate(35 41 238)"/>
+          <circle cx="70" cy="30" r="4" fill="#2b2421"/>
+          <defs><radialGradient id="brass" cx=".35" cy=".3"><stop offset="0" stop-color="#f1ddb0"/><stop offset="1" stop-color="#b98d50"/></radialGradient></defs>
+        </svg>
+      </div>
+      <div class="panel"><i class="led"></i>33⅓ RPM</div>
+      <div class="keys">
+        <button class="key" id="kRew" disabled title="เริ่มใหม่" aria-label="เริ่มใหม่">⏮</button>
+        <button class="key" id="kPlay" disabled title="เล่น/หยุด" aria-label="เล่นหรือหยุด">⏯</button>
+        <button class="key" id="kEject" disabled title="หยุดเพลง" aria-label="หยุดเพลง">⏹</button>
+      </div>
+    </div>
+
+    <div class="rec draggable" id="rRec"></div>
+    <div class="drag-hint" id="dragHint">⬆ ลากขึ้นไป (หรือแตะที่แผ่น)</div>
+
+    <section class="reveal" id="reveal">
+      <div class="video"><div id="yt"></div></div>
+      <div class="polaroid hidden" id="polaroid"><img id="rPhoto" alt=""><div class="cap" id="rPhotoCap"></div></div>
+      <div class="letter" id="letter"><span id="letterText"></span><span class="caret" id="caret"></span><div class="from hidden" id="letterFrom"></div></div>
+      <button class="btn" id="makeOwn" type="button">ทำแผ่นส่งให้คนอื่นบ้าง 💿</button>
+    </section>
+  </div>
+</main>
+
+<div class="toast" id="toast"></div>
+
+<script>
+(() => {
+'use strict';
+const $ = id => document.getElementById(id);
+const COLORS = ['#d9644a','#e8b04a','#7c9a6d','#5f84a2','#b5676f','#efe3c8'];
+
+/* ---------- record SVG ---------- */
+function esc(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function cut(s,n){ const a=Array.from(s); return a.length>n ? a.slice(0,n-1).join('')+'…' : s; }
+function recordSVG(color,label){
+  let grooves='';
+  for(let r=40;r<=94;r+=3.4) grooves+=`<circle cx="100" cy="100" r="${r}" fill="none" stroke="rgba(255,255,255,${r%2<1?.07:.035})" stroke-width=".8"/>`;
+  return `<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <circle cx="100" cy="100" r="99" fill="#1c1816"/>
+    ${grooves}
+    <circle cx="100" cy="100" r="41" fill="none" stroke="#0e0b0a" stroke-width="3"/>
+    <circle cx="100" cy="100" r="34" fill="${color}"/>
+    <circle cx="100" cy="100" r="30" fill="none" stroke="rgba(58,42,32,.35)" stroke-width=".8"/>
+    <text x="100" y="91" text-anchor="middle" font-family="Mali,sans-serif" font-size="11" font-weight="700" fill="#3a2a20">${esc(cut(label||'side A',12))}</text>
+    <text x="100" y="122" text-anchor="middle" font-family="Mali,sans-serif" font-size="6.5" letter-spacing="1" fill="#3a2a20" opacity=".7">33⅓ · SIDE A</text>
+    <circle cx="100" cy="100" r="3.2" fill="#f3e9d8"/>
+  </svg>`;
+}
+
+/* ---------- link encoding (compressed JSON in the #hash) ---------- */
+const b64u = {
+  enc: bytes => { let s=''; bytes.forEach(b=>s+=String.fromCharCode(b)); return btoa(s).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,''); },
+  dec: str => { str=str.replace(/-/g,'+').replace(/_/g,'/'); while(str.length%4)str+='='; const s=atob(str); return Uint8Array.from(s,c=>c.charCodeAt(0)); }
+};
+async function pipe(bytes, stream){ return new Uint8Array(await new Response(new Blob([bytes]).stream().pipeThrough(stream)).arrayBuffer()); }
+async function encode(obj){
+  const raw = new TextEncoder().encode(JSON.stringify(obj));
+  if ('CompressionStream' in window){
+    try { return 'z' + b64u.enc(await pipe(raw, new CompressionStream('deflate-raw'))); } catch(e){}
+  }
+  return 'b' + b64u.enc(raw);
+}
+async function decode(str){
+  const kind = str[0], bytes = b64u.dec(str.slice(1));
+  const raw = kind === 'z' ? await pipe(bytes, new DecompressionStream('deflate-raw')) : bytes;
+  return JSON.parse(new TextDecoder().decode(raw));
+}
+
+function ytId(url){
+  if(!url) return null;
+  url = url.trim();
+  if(/^[\w-]{11}$/.test(url)) return url;
+  try{
+    const u = new URL(url);
+    const h = u.hostname.replace(/^www\.|^m\.|^music\./,'');
+    if(h==='youtu.be') return u.pathname.slice(1,12) || null;
+    if(h==='youtube.com' || h==='youtube-nocookie.com'){
+      if(u.searchParams.get('v')) return u.searchParams.get('v').slice(0,11);
+      const m = u.pathname.match(/^\/(?:shorts|embed|live|v)\/([\w-]{11})/);
+      if(m) return m[1];
+    }
+  }catch(e){}
+  return null;
+}
+function ytStart(url){
+  try{ const t=new URL(url.trim()).searchParams.get('t'); if(!t) return 0;
+    const m=t.match(/(?:(\d+)h)?(?:(\d+)m)?(?:(\d+)s?)?/); return (+m[1]||0)*3600+(+m[2]||0)*60+(+m[3]||0);
+  }catch(e){return 0}
+}
+function toast(msg){ const t=$('toast'); t.textContent=msg; t.classList.add('show'); clearTimeout(toast._t); toast._t=setTimeout(()=>t.classList.remove('show'),1800); }
+
+/* ================= CREATE ================= */
+function initCreate(){
+  $('create').classList.remove('hidden');
+  let color = COLORS[0], photo = null;
+  const draw = () => {
+    const to=$('fTo').value.trim();
+    $('previewRec').innerHTML = recordSVG(color, to ? 'ถึง '+to : 'side A');
+    $('sleeveName').textContent = to || 'ใครสักคน';
+  };
+  COLORS.forEach((c,i)=>{
+    const b=document.createElement('button'); b.type='button'; b.className='swatch'+(i?'':' on'); b.style.background=c; b.setAttribute('aria-label','สี '+(i+1));
+    b.onclick=()=>{ color=c; document.querySelectorAll('.swatch').forEach(s=>s.classList.toggle('on',s===b)); draw(); };
+    $('swatches').appendChild(b);
+  });
+  $('fTo').addEventListener('input', draw); draw();
+
+  $('fSong').addEventListener('input', ()=>{
+    const v=$('fSong').value; $('songErr').classList.toggle('hidden', !v || !!ytId(v));
+    const s=ytStart(v); if(s && !$('fStart').value) $('fStart').value=s;
+  });
+
+  $('photoBtn').onclick=()=>$('fPhoto').click();
+  $('photoClear').onclick=()=>{ photo=null; $('photoThumb').classList.add('hidden'); $('photoClear').classList.add('hidden'); $('fPhoto').value=''; };
+  $('fPhoto').onchange=e=>{
+    const f=e.target.files[0]; if(!f) return;
+    const img=new Image(); img.onload=()=>{
+      // square-crop and shrink so the link stays short
+      const S=200, c=document.createElement('canvas'); c.width=c.height=S;
+      const m=Math.min(img.width,img.height);
+      c.getContext('2d').drawImage(img,(img.width-m)/2,(img.height-m)/2,m,m,0,0,S,S);
+      photo=c.toDataURL('image/webp',0.6); if(!photo.startsWith('data:image/webp')) photo=c.toDataURL('image/jpeg',0.6);
+      $('photoThumb').src=photo; $('photoThumb').classList.remove('hidden'); $('photoClear').classList.remove('hidden');
+      URL.revokeObjectURL(img.src);
+    };
+    img.src=URL.createObjectURL(f);
+  };
+
+  $('makeBtn').onclick=async()=>{
+    const id=ytId($('fSong').value);
+    if(!id){ $('songErr').classList.remove('hidden'); $('fSong').focus(); return; }
+    const data={v:1,y:id,t:$('fTo').value.trim(),f:$('fFrom').value.trim(),m:$('fMsg').value.trim(),c:color,s:Math.max(0,parseInt($('fStart').value)||0)};
+    if(photo) data.p=photo;
+    const link=location.origin+location.pathname+'#'+await encode(data);
+    $('outLink').value=link; $('openLink').href=link;
+    $('result').classList.remove('hidden'); $('result').scrollIntoView({behavior:'smooth',block:'center'});
+  };
+  $('copyBtn').onclick=async()=>{
+    try{ await navigator.clipboard.writeText($('outLink').value); }catch(e){ $('outLink').select(); document.execCommand('copy'); }
+    toast('คัดลอกแล้ว ส่งให้เขาได้เลย 💌');
+  };
+  $('shareBtn').onclick=async()=>{
+    if(navigator.share){ try{ await navigator.share({title:'มีแผ่นเสียงส่งถึงคุณ 💿',url:$('outLink').value}); }catch(e){} }
+    else $('copyBtn').click();
+  };
+}
+
+/* ================= RECEIVE ================= */
+function initReceive(d){
+  $('receive').classList.remove('hidden');
+  if(d.t){ $('rTitle').textContent='มีแผ่นเสียงส่งถึง '+d.t; document.title='💿 ถึง '+d.t; }
+  const rec=$('rRec'), tt=$('tt'), platter=$('platter');
+  rec.innerHTML=recordSVG(d.c||COLORS[0], d.t?'ถึง '+d.t:'side A');
+  if(d.p){ $('rPhoto').src=d.p; $('polaroid').classList.remove('hidden'); $('rPhotoCap').textContent=d.f?'— '+d.f:''; }
+
+  /* YouTube player (loaded up front so play() can run inside the user's gesture) */
+  let player=null, ready=false, wantPlay=false, playing=false;
+  window.onYouTubeIframeAPIReady=()=>{
+    player=new YT.Player('yt',{videoId:d.y,playerVars:{start:d.s||0,playsinline:1,rel:0,modestbranding:1},
+      events:{
+        onReady:()=>{ ready=true; if(wantPlay) player.playVideo(); },
+        onStateChange:e=>{ playing = e.data===YT.PlayerState.PLAYING; rec.classList.toggle('paused',!playing); tt.classList.toggle('on',playing); }
+      }});
+  };
+  const s=document.createElement('script'); s.src='https://www.youtube.com/iframe_api'; document.head.appendChild(s);
+  const play=()=>{ wantPlay=true; if(ready) player.playVideo(); };
+
+  /* drag the record onto the platter */
+  let sx=0,sy=0,dx=0,dy=0,dragging=false,moved=false,loaded=false;
+  const overTarget=()=>{ const a=rec.getBoundingClientRect(), b=platter.getBoundingClientRect();
+    const cx=a.left+a.width/2, cy=a.top+a.height/2; return cx>b.left-30&&cx<b.right+30&&cy>b.top-30&&cy<b.bottom+30; };
+  rec.addEventListener('pointerdown',e=>{ if(loaded) return; dragging=true; moved=false; sx=e.clientX; sy=e.clientY; rec.setPointerCapture(e.pointerId); rec.classList.add('dragging'); rec.style.transition='none'; });
+  rec.addEventListener('pointermove',e=>{ if(!dragging) return; dx=e.clientX-sx; dy=e.clientY-sy; if(Math.hypot(dx,dy)>6) moved=true;
+    rec.style.transform=`translate(${dx}px,${dy}px) rotate(${dx/4}deg)`; platter.classList.toggle('hot',overTarget()); });
+  const end=()=>{ if(!dragging) return; dragging=false; rec.classList.remove('dragging'); platter.classList.remove('hot');
+    if(!moved || overTarget()) insert(); else { rec.style.transition='transform .35s cubic-bezier(.3,1.5,.6,1)'; rec.style.transform=''; } };
+  rec.addEventListener('pointerup',end); rec.addEventListener('pointercancel',end);
+
+  function insert(){
+    loaded=true; play();                       // inside the gesture → audio allowed
+    const first=rec.getBoundingClientRect();
+    $('slot').appendChild(rec); rec.style.transition='none'; rec.style.transform='';
+    const last=rec.getBoundingClientRect();
+    rec.style.transformOrigin='top left';
+    rec.style.transform=`translate(${first.left-last.left}px,${first.top-last.top}px) scale(${first.width/last.width})`;
+    requestAnimationFrame(()=>requestAnimationFrame(()=>{ rec.style.transition='transform .55s cubic-bezier(.2,.9,.3,1)'; rec.style.transform=''; }));
+    rec.classList.remove('draggable'); rec.classList.add('spin','paused');
+    $('platHint').classList.add('hidden'); $('dragHint').classList.add('hidden');
+    ['kRew','kPlay','kEject'].forEach(k=>$(k).disabled=false);
+    $('rSub').textContent = d.f ? 'เพลงนี้จาก '+d.f : 'เพลงนี้สำหรับคุณ';
+    setTimeout(()=>{ $('reveal').classList.add('show'); typeLetter(); }, 900);
+  }
+
+  $('kPlay').onclick=()=>{ if(!ready) return play(); playing ? player.pauseVideo() : player.playVideo(); };
+  $('kRew').onclick=()=>{ if(ready){ player.seekTo(d.s||0,true); player.playVideo(); } };
+  $('kEject').onclick=()=>{ if(ready){ player.pauseVideo(); player.seekTo(d.s||0,true); player.pauseVideo(); } toast('แผ่นนี้อยู่ในลิงก์ เปิดฟังกี่ครั้งก็ได้ 💛'); };
+
+  let typed=false;
+  function typeLetter(){
+    if(typed) return; typed=true;
+    const text=d.m||'(ไม่มีข้อความ แต่ตั้งใจเลือกเพลงนี้ให้นะ)', out=$('letterText');
+    const chars=Array.from(text); let i=0;
+    const reduce=matchMedia('(prefers-reduced-motion:reduce)').matches;
+    const done=()=>{ $('caret').classList.add('hidden'); if(d.f){ $('letterFrom').textContent='— '+d.f; $('letterFrom').classList.remove('hidden'); } };
+    if(reduce){ out.textContent=text; return done(); }
+    (function step(){ out.textContent=chars.slice(0,++i).join(''); if(i<chars.length) setTimeout(step, chars[i-1]==='\n'?250:45); else done(); })();
+  }
+
+  $('makeOwn').onclick=()=>{ location.href=location.pathname; };
+}
+
+/* ---------- route ---------- */
+(async()=>{
+  const h=location.hash.slice(1);
+  if(!h) return initCreate();
+  try{ const d=await decode(h); if(!d.y) throw 0; initReceive(d); }
+  catch(e){ toast('ลิงก์นี้เสียหรือไม่ครบ'); initCreate(); }
+})();
+window.addEventListener('hashchange',()=>location.reload());
+})();
+</script>
+</body>
+</html>
