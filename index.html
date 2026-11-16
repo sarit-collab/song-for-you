@@ -9,11 +9,17 @@
 <meta property="og:description" content="เปิดดูสิ ใครบางคนอยากให้ฟังเพลงนี้">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Mali:wght@400;600;700&display=swap" rel="stylesheet">
+<script type="importmap">
+{"imports":{
+  "three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+  "three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+}}
+</script>
 <style>
 :root{
   --paper:#f3e9d8; --ink:#3a2a20; --muted:#8b7563; --line:#e2d2b9;
   --card:#fbf5ea; --accent:#c4573e; --accent-d:#93402c; --accent2:#7c9a6d;
-  --wood1:#8a5634; --wood2:#9a6440; --wood3:#7a4a2b; --brass1:#f1ddb0; --brass2:#c39a5c;
+  --brass1:#f1ddb0; --brass2:#c39a5c;
 }
 *{box-sizing:border-box}
 html,body{margin:0}
@@ -28,7 +34,7 @@ body{
 }
 .wrap{max-width:520px;margin:0 auto;padding:28px 16px 60px}
 h1{font-size:26px;margin:0 0 4px;text-align:center;letter-spacing:.3px}
-.sub{color:var(--muted);text-align:center;margin:0 0 22px;font-size:15px}
+.sub{color:var(--muted);text-align:center;margin:0 0 14px;font-size:15px}
 .hidden{display:none!important}
 button{font:inherit;cursor:pointer}
 .btn{background:var(--accent);color:#fff8ee;border:0;border-radius:999px;padding:12px 22px;font-weight:700;font-size:16px;box-shadow:0 3px 0 var(--accent-d);transition:transform .1s}
@@ -57,18 +63,13 @@ textarea{min-height:110px;resize:vertical}
 .linkbox{display:flex;gap:8px;margin-top:8px}
 .linkbox input{flex:1;font-size:13px}
 
-/* ---------- record ---------- */
-.rec{width:220px;max-width:62vw;aspect-ratio:1;position:relative;touch-action:none;user-select:none;-webkit-user-select:none;border-radius:50%}
+/* ---------- 2D record (create preview) ---------- */
+.rec{width:176px;aspect-ratio:1;position:relative;border-radius:50%}
 .rec svg{width:100%;height:100%;display:block;border-radius:50%;filter:drop-shadow(0 6px 10px rgba(40,20,10,.35))}
 .rec::after{content:"";position:absolute;inset:2%;border-radius:50%;pointer-events:none;
   background:conic-gradient(from 20deg,transparent 0 8%,rgba(255,255,255,.13) 12%,transparent 17% 58%,rgba(255,255,255,.1) 62%,transparent 67%)}
-.spin svg{animation:spin 1.8s linear infinite}
-.paused svg{animation-play-state:paused}
-@keyframes spin{to{transform:rotate(360deg)}}
-
-/* sleeve (create preview) */
 .sleeve-wrap{position:relative;width:290px;max-width:100%;height:200px;margin:0 auto 10px}
-.sleeve-wrap .rec{position:absolute;right:0;top:12px;width:176px;transition:right .4s}
+.sleeve-wrap .rec{position:absolute;right:0;top:12px}
 .sleeve{position:absolute;left:0;top:6px;width:188px;height:188px;z-index:2;border-radius:4px;
   background:
     radial-gradient(circle at 50% 50%,rgba(0,0,0,.18) 0 15px,transparent 16px),
@@ -80,35 +81,17 @@ textarea{min-height:110px;resize:vertical}
 .sleeve .sn{font-size:20px;font-weight:700;line-height:1.2;word-break:break-word}
 .sleeve::before{content:"";position:absolute;left:14px;right:14px;top:14px;height:3px;background:rgba(74,51,34,.35);border-radius:2px}
 
-/* ---------- turntable ---------- */
-.stage{display:flex;flex-direction:column;align-items:center;gap:26px;margin-top:8px}
-.tt{width:350px;max-width:92vw;aspect-ratio:1.06;border-radius:18px;position:relative;
-  background:
-    linear-gradient(180deg,rgba(255,230,190,.18),rgba(0,0,0,.12)),
-    repeating-linear-gradient(91deg,var(--wood1) 0 7px,var(--wood2) 7px 10px,var(--wood3) 10px 16px,var(--wood2) 16px 19px);
-  box-shadow:0 9px 0 #4e2f1b,0 20px 34px rgba(60,30,10,.35),inset 0 0 0 3px rgba(255,220,170,.15)}
-.platter{position:absolute;left:4.5%;top:4.5%;width:68%;aspect-ratio:1;border-radius:50%;
-  background:radial-gradient(circle,#4a4440 0 4%,#24201e 4.5% 100%);
-  box-shadow:0 0 0 7px #cdbb9c,0 0 0 9px #8f7c60,0 4px 10px 8px rgba(0,0,0,.25);transition:box-shadow .2s}
-.platter.hot{box-shadow:0 0 0 7px var(--brass1),0 0 0 9px var(--brass2),0 0 22px 10px rgba(255,210,140,.6)}
-.platter .hint{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#a5968a;font-size:15px;text-align:center;padding:0 22%}
-.platter .slot{position:absolute;inset:2%}
-.platter .slot .rec{width:100%;max-width:none}
-.arm{position:absolute;right:4%;top:6%;width:25%;transform-origin:70% 11%;transform:rotate(0deg);transition:transform 1s cubic-bezier(.4,0,.2,1);pointer-events:none;z-index:5}
-.arm svg{width:100%;display:block;filter:drop-shadow(2px 4px 3px rgba(0,0,0,.35))}
-.tt.on .arm{transform:rotate(24deg)}
-.panel{position:absolute;left:5%;bottom:5%;display:flex;align-items:center;gap:7px;color:#f3dcc0;font-size:12px;letter-spacing:1.5px}
-.led{width:9px;height:9px;border-radius:50%;background:#5a2a1f;box-shadow:inset 0 1px 1px rgba(0,0,0,.5)}
-.tt.on .led{background:#ff7a4a;box-shadow:0 0 8px #ff7a4a}
-.keys{position:absolute;right:5%;bottom:4.5%;display:flex;gap:8px}
-.key{width:40px;height:40px;border-radius:50%;border:0;font-size:14px;color:#4a3322;
-  background:radial-gradient(circle at 35% 30%,var(--brass1),var(--brass2));box-shadow:0 3px 0 #7d5e33,0 4px 6px rgba(0,0,0,.3)}
-.key:active{transform:translateY(2px);box-shadow:0 1px 0 #7d5e33}
-.key:disabled{opacity:.55;cursor:default}
-.drag-hint{color:var(--muted);font-size:14px;animation:bob 1.6s ease-in-out infinite}
+/* ---------- 3D stage ---------- */
+.scene{position:relative;width:100%;aspect-ratio:1/1.12;margin:0 auto;touch-action:none;user-select:none;-webkit-user-select:none}
+.scene canvas{width:100%;height:100%;display:block;outline:none}
+.scene .loading{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:var(--muted)}
+.scene-hint{position:absolute;left:0;right:0;bottom:6px;text-align:center;color:var(--muted);font-size:14px;pointer-events:none;animation:bob 1.6s ease-in-out infinite}
 @keyframes bob{50%{transform:translateY(-4px)}}
-.rec.dragging{z-index:50;cursor:grabbing}
-.rec.draggable{cursor:grab}
+.ctrl{display:flex;gap:12px;justify-content:center;margin:6px 0 22px}
+.key{width:48px;height:48px;border-radius:50%;border:0;font-size:16px;color:#4a3322;
+  background:radial-gradient(circle at 35% 30%,var(--brass1),var(--brass2));box-shadow:0 3px 0 #7d5e33,0 4px 6px rgba(0,0,0,.25)}
+.key:active{transform:translateY(2px);box-shadow:0 1px 0 #7d5e33}
+.key:disabled{opacity:.45;cursor:default}
 
 .reveal{width:100%;display:flex;flex-direction:column;align-items:center;gap:20px;opacity:0;transform:translateY(12px);transition:opacity .6s,transform .6s}
 .reveal.show{opacity:1;transform:none}
@@ -126,7 +109,7 @@ textarea{min-height:110px;resize:vertical}
 .foot{color:var(--muted);font-size:13px;text-align:center;margin-top:30px}
 .toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--ink);color:#fff;padding:10px 18px;border-radius:999px;font-size:14px;opacity:0;transition:opacity .3s;pointer-events:none}
 .toast.show{opacity:1}
-@media (prefers-reduced-motion:reduce){.spin svg,.drag-hint{animation:none}.arm{transition:none}}
+@media (prefers-reduced-motion:reduce){.scene-hint{animation:none}}
 </style>
 </head>
 <body>
@@ -192,42 +175,23 @@ textarea{min-height:110px;resize:vertical}
   <h1 id="rTitle">มีแผ่นเสียงส่งถึงคุณ</h1>
   <p class="sub" id="rSub">ลากแผ่นเสียงไปวางบนเครื่องเล่นเลย</p>
 
-  <div class="stage">
-    <div class="tt" id="tt">
-      <div class="platter" id="platter">
-        <div class="hint" id="platHint">วางแผ่นตรงนี้</div>
-        <div class="slot" id="slot"></div>
-      </div>
-      <div class="arm" aria-hidden="true">
-        <svg viewBox="0 0 100 270" xmlns="http://www.w3.org/2000/svg">
-          <circle cx="70" cy="30" r="22" fill="#2b2421"/>
-          <circle cx="70" cy="30" r="15" fill="url(#brass)" stroke="#7d5e33" stroke-width="2"/>
-          <rect x="62" y="2" width="16" height="14" rx="4" fill="#3a302b"/>
-          <path d="M70 30 L66 205 Q64 222 46 236" fill="none" stroke="#d9cdb8" stroke-width="7" stroke-linecap="round"/>
-          <path d="M70 30 L66 205 Q64 222 46 236" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" opacity=".5"/>
-          <rect x="26" y="228" width="30" height="20" rx="4" fill="#2b2421" transform="rotate(35 41 238)"/>
-          <circle cx="70" cy="30" r="4" fill="#2b2421"/>
-          <defs><radialGradient id="brass" cx=".35" cy=".3"><stop offset="0" stop-color="#f1ddb0"/><stop offset="1" stop-color="#b98d50"/></radialGradient></defs>
-        </svg>
-      </div>
-      <div class="panel"><i class="led"></i>33⅓ RPM</div>
-      <div class="keys">
-        <button class="key" id="kRew" disabled title="เริ่มใหม่" aria-label="เริ่มใหม่">⏮</button>
-        <button class="key" id="kPlay" disabled title="เล่น/หยุด" aria-label="เล่นหรือหยุด">⏯</button>
-        <button class="key" id="kEject" disabled title="หยุดเพลง" aria-label="หยุดเพลง">⏹</button>
-      </div>
-    </div>
-
-    <div class="rec draggable" id="rRec"></div>
-    <div class="drag-hint" id="dragHint">⬆ ลากขึ้นไป (หรือแตะที่แผ่น)</div>
-
-    <section class="reveal" id="reveal">
-      <div class="video"><div id="yt"></div></div>
-      <div class="polaroid hidden" id="polaroid"><img id="rPhoto" alt=""><div class="cap" id="rPhotoCap"></div></div>
-      <div class="letter" id="letter"><span id="letterText"></span><span class="caret" id="caret"></span><div class="from hidden" id="letterFrom"></div></div>
-      <button class="btn" id="makeOwn" type="button">ทำแผ่นส่งให้คนอื่นบ้าง 💿</button>
-    </section>
+  <div class="scene" id="scene">
+    <canvas id="c3d" aria-label="เครื่องเล่นแผ่นเสียง 3 มิติ"></canvas>
+    <div class="loading" id="loading">กำลังจัดโต๊ะ...</div>
+    <div class="scene-hint hidden" id="dragHint">ลากแผ่นไปวางบนเครื่องเล่น · ลากพื้นที่ว่างเพื่อหมุนดู</div>
   </div>
+  <div class="ctrl">
+    <button class="key" id="kRew" disabled title="เริ่มใหม่" aria-label="เริ่มใหม่">⏮</button>
+    <button class="key" id="kPlay" title="เล่น/หยุด" aria-label="เล่นหรือหยุด">⏯</button>
+    <button class="key" id="kStop" disabled title="หยุดเพลง" aria-label="หยุดเพลง">⏹</button>
+  </div>
+
+  <section class="reveal" id="reveal">
+    <div class="video"><div id="yt"></div></div>
+    <div class="polaroid hidden" id="polaroid"><img id="rPhoto" alt=""><div class="cap" id="rPhotoCap"></div></div>
+    <div class="letter" id="letter"><span id="letterText"></span><span class="caret" id="caret"></span><div class="from hidden" id="letterFrom"></div></div>
+    <button class="btn" id="makeOwn" type="button">ทำแผ่นส่งให้คนอื่นบ้าง 💿</button>
+  </section>
 </main>
 
 <div class="toast" id="toast"></div>
@@ -237,16 +201,16 @@ textarea{min-height:110px;resize:vertical}
 'use strict';
 const $ = id => document.getElementById(id);
 const COLORS = ['#d9644a','#e8b04a','#7c9a6d','#5f84a2','#b5676f','#efe3c8'];
+const REDUCE = matchMedia('(prefers-reduced-motion:reduce)').matches;
 
-/* ---------- record SVG ---------- */
+/* ---------- 2D record SVG (create page) ---------- */
 function esc(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 function cut(s,n){ const a=Array.from(s); return a.length>n ? a.slice(0,n-1).join('')+'…' : s; }
 function recordSVG(color,label){
   let grooves='';
   for(let r=40;r<=94;r+=3.4) grooves+=`<circle cx="100" cy="100" r="${r}" fill="none" stroke="rgba(255,255,255,${r%2<1?.07:.035})" stroke-width=".8"/>`;
   return `<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-    <circle cx="100" cy="100" r="99" fill="#1c1816"/>
-    ${grooves}
+    <circle cx="100" cy="100" r="99" fill="#1c1816"/>${grooves}
     <circle cx="100" cy="100" r="41" fill="none" stroke="#0e0b0a" stroke-width="3"/>
     <circle cx="100" cy="100" r="34" fill="${color}"/>
     <circle cx="100" cy="100" r="30" fill="none" stroke="rgba(58,42,32,.35)" stroke-width=".8"/>
@@ -354,64 +318,225 @@ function initCreate(){
   };
 }
 
+/* ================= 3D TURNTABLE ================= */
+async function build3D(d, api){
+  const THREE = await import('three');
+  const { OrbitControls } = await import('three/addons/controls/OrbitControls.js');
+  const { RoundedBoxGeometry } = await import('three/addons/geometries/RoundedBoxGeometry.js');
+  try{ await document.fonts.load('700 52px Mali'); }catch(e){}
+
+  const wrap=$('scene'), canvas=$('c3d');
+  const renderer=new THREE.WebGLRenderer({canvas,antialias:true,alpha:true});
+  renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+  renderer.shadowMap.enabled=true; renderer.shadowMap.type=THREE.PCFSoftShadowMap;
+  renderer.outputColorSpace=THREE.SRGBColorSpace;
+  renderer.toneMapping=THREE.ACESFilmicToneMapping; renderer.toneMappingExposure=1.05;
+
+  const scene=new THREE.Scene();
+  const camera=new THREE.PerspectiveCamera(34,1,0.1,500);
+  const controls=new OrbitControls(camera,canvas);
+  controls.target.set(0,3,13); controls.enableDamping=true; controls.enablePan=false;
+  controls.minDistance=55; controls.maxDistance=150;
+  controls.minPolarAngle=0.2; controls.maxPolarAngle=Math.PI*0.44;
+  controls.autoRotate=!REDUCE; controls.autoRotateSpeed=0.7;
+  let userMoved=false;
+  controls.addEventListener('start',()=>{ userMoved=true; controls.autoRotate=false; });
+
+  /* lights + soft floor shadow */
+  scene.add(new THREE.HemisphereLight(0xfff3df,0x7a5a44,1.15));
+  const sun=new THREE.DirectionalLight(0xffe6c4,2.3);
+  sun.position.set(-28,62,34); sun.castShadow=true; sun.shadow.mapSize.set(2048,2048);
+  Object.assign(sun.shadow.camera,{left:-55,right:55,top:55,bottom:-55,near:1,far:200});
+  sun.shadow.bias=-0.0004; sun.shadow.radius=5; scene.add(sun);
+  const fill=new THREE.DirectionalLight(0xffd9b0,0.5); fill.position.set(40,25,-20); scene.add(fill);
+  const floor=new THREE.Mesh(new THREE.PlaneGeometry(400,400),new THREE.ShadowMaterial({opacity:.16}));
+  floor.rotation.x=-Math.PI/2; floor.receiveShadow=true; scene.add(floor);
+
+  const canvasTex=(w,h,draw)=>{ const c=document.createElement('canvas'); c.width=w; c.height=h; draw(c.getContext('2d'),w,h);
+    const t=new THREE.CanvasTexture(c); t.colorSpace=THREE.SRGBColorSpace; t.anisotropy=renderer.capabilities.getMaxAnisotropy(); return t; };
+  const std=(color,rough=.5,metal=0,extra={})=>new THREE.MeshStandardMaterial(Object.assign({color,roughness:rough,metalness:metal},extra));
+  const mesh=(geo,mat,x=0,y=0,z=0,parent=scene)=>{ const m=new THREE.Mesh(geo,mat); m.position.set(x,y,z); m.castShadow=m.receiveShadow=true; parent.add(m); return m; };
+
+  /* wood plinth */
+  const woodTex=canvasTex(1024,512,(g,w,h)=>{
+    g.fillStyle='#8d5835'; g.fillRect(0,0,w,h);
+    for(let y=0;y<h;y+=2){ const n=Math.sin(y*.045)*.6+Math.sin(y*.011+1.3)*.4;
+      g.fillStyle=n>0?`rgba(70,35,12,${n*.22+Math.random()*.05})`:`rgba(205,145,90,${-n*.18+Math.random()*.04})`; g.fillRect(0,y,w,2); }
+    for(let i=0;i<46;i++){ g.strokeStyle=`rgba(55,25,8,${.08+Math.random()*.12})`; g.lineWidth=1+Math.random()*2; g.beginPath();
+      const y0=Math.random()*h; g.moveTo(0,y0); for(let x=0;x<=w;x+=24) g.lineTo(x,y0+Math.sin(x*.008+i)*7+Math.sin(x*.03+i*2)*1.5); g.stroke(); }
+  });
+  const W=46,H=6,D=38,FEET=1.2,TOP=FEET+H;
+  mesh(new RoundedBoxGeometry(W,H,D,5,1.3), std(0xffffff,.5,0,{map:woodTex}), 0,FEET+H/2,0);
+  const footMat=std(0x2a2220,.6,.2);
+  for(const [x,z] of [[-19,-15],[19,-15],[-19,15],[19,15]]) mesh(new THREE.CylinderGeometry(1.7,1.9,FEET,24),footMat,x,FEET/2,z);
+  // brass name plate
+  mesh(new THREE.BoxGeometry(9,.15,2.2), std(0xd9b878,.3,.85), -14.5,TOP+.07,16.4);
+
+  /* platter */
+  const PX=-5.5, PZ=0;
+  const platter=new THREE.Group(); platter.position.set(PX,TOP,PZ); scene.add(platter);
+  const rimMat=std(0xcdbb9c,.28,.85,{emissive:0x000000});
+  mesh(new THREE.CylinderGeometry(15.8,15.6,1.4,96),rimMat,0,.7,0,platter);
+  mesh(new THREE.CylinderGeometry(15.2,15.2,.2,96),std(0x24201e,.95),0,1.5,0,platter);
+  mesh(new THREE.CylinderGeometry(.32,.32,1.4,16),std(0xdedede,.2,1),0,2.1,0,platter);
+  const RECY=TOP+1.75;
+
+  /* record */
+  const label=d.t?cut('ถึง '+d.t,14):'side A', lc=d.c||COLORS[0];
+  const recTex=canvasTex(1024,1024,(g,w)=>{
+    const c=w/2; g.fillStyle='#151110'; g.fillRect(0,0,w,w);
+    for(let r=c*.36;r<c*.98;r+=2.1){ g.strokeStyle=`rgba(255,255,255,${.015+Math.random()*.045})`; g.lineWidth=1; g.beginPath(); g.arc(c,c,r,0,7); g.stroke(); }
+    for(const r of [.48,.6,.73,.86]){ g.strokeStyle='rgba(0,0,0,.85)'; g.lineWidth=5; g.beginPath(); g.arc(c,c,c*r,0,7); g.stroke(); }
+    g.fillStyle=lc; g.beginPath(); g.arc(c,c,c*.33,0,7); g.fill();
+    g.strokeStyle='rgba(58,42,32,.35)'; g.lineWidth=3; g.beginPath(); g.arc(c,c,c*.29,0,7); g.stroke();
+    g.fillStyle='#3a2a20'; g.textAlign='center'; g.textBaseline='middle';
+    g.font='700 50px Mali, sans-serif'; g.fillText(label,c,c-56);
+    g.globalAlpha=.7; g.font='600 22px Mali, sans-serif'; g.fillText('33⅓ RPM · SIDE A',c,c+70); g.globalAlpha=1;
+    g.fillStyle='#e9dcc4'; g.beginPath(); g.arc(c,c,11,0,7); g.fill();
+  });
+  const faceMat=new THREE.MeshPhysicalMaterial({map:recTex,roughness:.38,metalness:.15,clearcoat:.7,clearcoatRoughness:.25});
+  const record=new THREE.Group(); scene.add(record);
+  const disc=mesh(new THREE.CylinderGeometry(15,15,.3,128),[std(0x0d0a09,.4),faceMat,faceMat],0,0,0,record);
+  disc.rotation.y=Math.PI/2;                         // turn the label upright
+  const HOME=new THREE.Vector3(0,5,32);
+  record.position.copy(HOME); record.rotation.x=-.45; record.scale.setScalar(.72);
+
+  /* tonearm */
+  const arm=new THREE.Group(); arm.position.set(15.5,TOP,-12); scene.add(arm);
+  const brass=std(0xd2ad6c,.3,.9), dark=std(0x2b2421,.45,.5), chrome=std(0xe2dccf,.2,1);
+  mesh(new THREE.CylinderGeometry(3,3.2,1,40),dark,0,.5,0,arm);
+  mesh(new THREE.CylinderGeometry(1.8,1.8,2.2,32),brass,0,2,0,arm);
+  const beam=new THREE.Group(); beam.position.y=3.3; arm.add(beam);
+  const tube=mesh(new THREE.CylinderGeometry(.33,.33,21,16),chrome,0,0,9.5,beam); tube.rotation.x=Math.PI/2;
+  const cw=mesh(new THREE.CylinderGeometry(1.3,1.3,3,24),dark,0,0,-3.6,beam); cw.rotation.x=Math.PI/2;
+  const head=mesh(new THREE.BoxGeometry(2.2,.5,3.4),dark,-.5,-.3,21.2,beam); head.rotation.y=.35;
+  mesh(new THREE.BoxGeometry(1.2,.9,1.6),brass,-.6,-.9,21.4,beam);
+  // arm rest post
+  mesh(new THREE.CylinderGeometry(.45,.45,3.2,16),dark,16.5,TOP+1.6,8.5);
+
+  /* buttons + LED */
+  const buttons=[];
+  [['rew',12.5],['play',16.5],['stop',20.5]].forEach(([a,x])=>{
+    const b=mesh(new THREE.CylinderGeometry(1.35,1.45,.9,32),brass,x,TOP+.45,15.2); b.userData.a=a; buttons.push(b); });
+  const ledMat=std(0x5a2a1f,.4,0,{emissive:0x000000});
+  mesh(new THREE.SphereGeometry(.55,20,16),ledMat,-20,TOP+.2,16.4);
+
+  /* sizing */
+  function resize(){
+    const w=wrap.clientWidth, h=wrap.clientHeight; renderer.setSize(w,h,false);
+    camera.aspect=w/h; camera.updateProjectionMatrix();
+    if(!userMoved){ const dist=camera.aspect<.95?130:108; camera.position.set(0,dist*.8,dist*.6).add(controls.target); controls.update(); }
+  }
+  new ResizeObserver(resize).observe(wrap); resize();
+
+  /* interaction: drag record, click buttons, otherwise orbit */
+  const ray=new THREE.Raycaster(), ndc=new THREE.Vector2(), plane=new THREE.Plane(new THREE.Vector3(0,1,0),-(TOP+5)), hitP=new THREE.Vector3();
+  let state='waiting', drag=null, hot=false, dragTarget=HOME.clone(), placeT=0, placeFrom=new THREE.Vector3();
+  const setNdc=e=>{ const r=canvas.getBoundingClientRect(); ndc.set((e.clientX-r.left)/r.width*2-1,-(e.clientY-r.top)/r.height*2+1); ray.setFromCamera(ndc,camera); };
+  const overPlatter=p=>Math.hypot(p.x-PX,p.z-PZ)<14;
+
+  wrap.addEventListener('pointerdown',e=>{
+    setNdc(e);
+    if(state==='waiting' && ray.intersectObject(record,true).length){
+      controls.enabled=false; state='dragging'; drag={x:e.clientX,y:e.clientY,moved:false};
+      wrap.setPointerCapture(e.pointerId); controls.autoRotate=false; e.stopPropagation(); return;
+    }
+    const b=ray.intersectObjects(buttons)[0];
+    if(b){ e.stopPropagation(); controls.enabled=false; const o=b.object; o.position.y=TOP+.2; setTimeout(()=>{o.position.y=TOP+.45; controls.enabled=true;},160); api.button(o.userData.a); }
+  },true);
+  wrap.addEventListener('pointermove',e=>{
+    setNdc(e);
+    if(state==='dragging'){
+      if(Math.hypot(e.clientX-drag.x,e.clientY-drag.y)>6) drag.moved=true;
+      if(ray.ray.intersectPlane(plane,hitP)){ dragTarget.copy(hitP); hot=overPlatter(hitP); }
+      return;
+    }
+    const over = (state==='waiting' && ray.intersectObject(record,true).length) || ray.intersectObjects(buttons).length;
+    canvas.style.cursor = over ? 'grab' : '';
+  });
+  const end=()=>{
+    if(state!=='dragging') return; controls.enabled=true; hot=false;
+    if(!drag.moved || overPlatter(dragTarget)) place(); else state='waiting';
+  };
+  wrap.addEventListener('pointerup',end); wrap.addEventListener('pointercancel',end);
+
+  function place(){ if(state==='placing'||state==='loaded') return; state='placing'; placeT=0; placeFrom.copy(record.position); $('dragHint').classList.add('hidden'); api.placed(); }
+
+  /* render loop */
+  let playing=false; const clock=new THREE.Clock(); const tgt=new THREE.Vector3();
+  const lerp=(a,b,k)=>a+(b-a)*k;
+  renderer.setAnimationLoop(()=>{
+    const dt=Math.min(clock.getDelta(),.1), t=clock.elapsedTime, k=1-Math.pow(.001,dt);
+    if(state==='waiting'){
+      tgt.copy(HOME); tgt.y+=REDUCE?0:Math.sin(t*2)*.6; record.position.lerp(tgt,k*.6);
+      record.rotation.x=lerp(record.rotation.x,-.45,k); if(!REDUCE) record.rotation.y+=dt*.4;
+    } else if(state==='dragging'){
+      tgt.copy(dragTarget); record.position.lerp(tgt,1-Math.pow(1e-6,dt));
+      record.rotation.x=lerp(record.rotation.x,0,k);
+    } else if(state==='placing'){
+      placeT=Math.min(1,placeT+dt/.75); const e=1-Math.pow(1-placeT,3);
+      record.position.set(lerp(placeFrom.x,PX,e), lerp(placeFrom.y,RECY,e)+Math.sin(Math.PI*e)*4, lerp(placeFrom.z,PZ,e));
+      record.rotation.x=lerp(record.rotation.x,0,k*2);
+      if(placeT>=1){ state='loaded'; record.rotation.x=0; record.position.set(PX,RECY,PZ); }
+    }
+    record.scale.setScalar(lerp(record.scale.x, state==='waiting'?.72:1, k));
+    if(state==='loaded' && playing){ const w=dt*3.49; record.rotation.y-=w; platter.rotation.y-=w; }
+    const armOn = state==='loaded' && playing;
+    arm.rotation.y=lerp(arm.rotation.y, armOn?-.6:0, k*.35);
+    beam.rotation.x=lerp(beam.rotation.x, armOn?.012:-.05, k*.5);
+    rimMat.emissive.setHex(hot?0x6b4a1a:0x000000);
+    ledMat.emissive.setHex(armOn?0xff5a2a:0x000000);
+    controls.update(); renderer.render(scene,camera);
+  });
+
+  $('loading').classList.add('hidden'); $('dragHint').classList.remove('hidden');
+  return { setPlaying:v=>{ playing=v; }, place:()=>{ if(state==='waiting'||state==='dragging') place(); } };
+}
+
 /* ================= RECEIVE ================= */
 function initReceive(d){
   $('receive').classList.remove('hidden');
   if(d.t){ $('rTitle').textContent='มีแผ่นเสียงส่งถึง '+d.t; document.title='💿 ถึง '+d.t; }
-  const rec=$('rRec'), tt=$('tt'), platter=$('platter');
-  rec.innerHTML=recordSVG(d.c||COLORS[0], d.t?'ถึง '+d.t:'side A');
   if(d.p){ $('rPhoto').src=d.p; $('polaroid').classList.remove('hidden'); $('rPhotoCap').textContent=d.f?'— '+d.f:''; }
 
   /* YouTube player (loaded up front so play() can run inside the user's gesture) */
-  let player=null, ready=false, wantPlay=false, playing=false;
+  let player=null, ready=false, wantPlay=false, playing=false, loaded=false, view=null;
   window.onYouTubeIframeAPIReady=()=>{
     player=new YT.Player('yt',{videoId:d.y,playerVars:{start:d.s||0,playsinline:1,rel:0,modestbranding:1},
       events:{
         onReady:()=>{ ready=true; if(wantPlay) player.playVideo(); },
-        onStateChange:e=>{ playing = e.data===YT.PlayerState.PLAYING; rec.classList.toggle('paused',!playing); tt.classList.toggle('on',playing); }
+        onStateChange:e=>{ playing = e.data===YT.PlayerState.PLAYING; view&&view.setPlaying(playing); }
       }});
   };
   const s=document.createElement('script'); s.src='https://www.youtube.com/iframe_api'; document.head.appendChild(s);
   const play=()=>{ wantPlay=true; if(ready) player.playVideo(); };
 
-  /* drag the record onto the platter */
-  let sx=0,sy=0,dx=0,dy=0,dragging=false,moved=false,loaded=false;
-  const overTarget=()=>{ const a=rec.getBoundingClientRect(), b=platter.getBoundingClientRect();
-    const cx=a.left+a.width/2, cy=a.top+a.height/2; return cx>b.left-30&&cx<b.right+30&&cy>b.top-30&&cy<b.bottom+30; };
-  rec.addEventListener('pointerdown',e=>{ if(loaded) return; dragging=true; moved=false; sx=e.clientX; sy=e.clientY; rec.setPointerCapture(e.pointerId); rec.classList.add('dragging'); rec.style.transition='none'; });
-  rec.addEventListener('pointermove',e=>{ if(!dragging) return; dx=e.clientX-sx; dy=e.clientY-sy; if(Math.hypot(dx,dy)>6) moved=true;
-    rec.style.transform=`translate(${dx}px,${dy}px) rotate(${dx/4}deg)`; platter.classList.toggle('hot',overTarget()); });
-  const end=()=>{ if(!dragging) return; dragging=false; rec.classList.remove('dragging'); platter.classList.remove('hot');
-    if(!moved || overTarget()) insert(); else { rec.style.transition='transform .35s cubic-bezier(.3,1.5,.6,1)'; rec.style.transform=''; } };
-  rec.addEventListener('pointerup',end); rec.addEventListener('pointercancel',end);
-
-  function insert(){
-    loaded=true; play();                       // inside the gesture → audio allowed
-    const first=rec.getBoundingClientRect();
-    $('slot').appendChild(rec); rec.style.transition='none'; rec.style.transform='';
-    const last=rec.getBoundingClientRect();
-    rec.style.transformOrigin='top left';
-    rec.style.transform=`translate(${first.left-last.left}px,${first.top-last.top}px) scale(${first.width/last.width})`;
-    requestAnimationFrame(()=>requestAnimationFrame(()=>{ rec.style.transition='transform .55s cubic-bezier(.2,.9,.3,1)'; rec.style.transform=''; }));
-    rec.classList.remove('draggable'); rec.classList.add('spin','paused');
-    $('platHint').classList.add('hidden'); $('dragHint').classList.add('hidden');
-    ['kRew','kPlay','kEject'].forEach(k=>$(k).disabled=false);
+  function placed(){
+    if(loaded) return; loaded=true; play();     // runs inside the user's gesture → audio allowed
+    ['kRew','kStop'].forEach(k=>$(k).disabled=false);
     $('rSub').textContent = d.f ? 'เพลงนี้จาก '+d.f : 'เพลงนี้สำหรับคุณ';
     setTimeout(()=>{ $('reveal').classList.add('show'); typeLetter(); }, 900);
   }
+  function button(a){
+    if(!loaded){ if(a==='play') view ? view.place() : placed(); return; }
+    if(a==='play'){ if(!ready) return play(); playing ? player.pauseVideo() : player.playVideo(); }
+    if(a==='rew' && ready){ player.seekTo(d.s||0,true); player.playVideo(); }
+    if(a==='stop' && ready){ player.pauseVideo(); player.seekTo(d.s||0,true); player.pauseVideo(); }
+  }
+  $('kPlay').onclick=()=>button('play');
+  $('kRew').onclick=()=>button('rew');
+  $('kStop').onclick=()=>button('stop');
 
-  $('kPlay').onclick=()=>{ if(!ready) return play(); playing ? player.pauseVideo() : player.playVideo(); };
-  $('kRew').onclick=()=>{ if(ready){ player.seekTo(d.s||0,true); player.playVideo(); } };
-  $('kEject').onclick=()=>{ if(ready){ player.pauseVideo(); player.seekTo(d.s||0,true); player.pauseVideo(); } toast('แผ่นนี้อยู่ในลิงก์ เปิดฟังกี่ครั้งก็ได้ 💛'); };
+  build3D(d,{placed,button}).then(v=>{ view=v; v.setPlaying(playing); })
+    .catch(err=>{ console.error(err); $('loading').textContent='เปิดแบบ 3D ไม่ได้ กดปุ่ม ⏯ ด้านล่างเพื่อฟังเพลงได้เลย'; });
 
   let typed=false;
   function typeLetter(){
     if(typed) return; typed=true;
     const text=d.m||'(ไม่มีข้อความ แต่ตั้งใจเลือกเพลงนี้ให้นะ)', out=$('letterText');
     const chars=Array.from(text); let i=0;
-    const reduce=matchMedia('(prefers-reduced-motion:reduce)').matches;
     const done=()=>{ $('caret').classList.add('hidden'); if(d.f){ $('letterFrom').textContent='— '+d.f; $('letterFrom').classList.remove('hidden'); } };
-    if(reduce){ out.textContent=text; return done(); }
+    if(REDUCE){ out.textContent=text; return done(); }
     (function step(){ out.textContent=chars.slice(0,++i).join(''); if(i<chars.length) setTimeout(step, chars[i-1]==='\n'?250:45); else done(); })();
   }
 
